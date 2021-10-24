@@ -11,8 +11,37 @@
     </script>
 </head>
 <body>
+    <hr><!-- ACCORDION BASIC -->
+    <accordion>
+        <ai header="this is some header 1">
+            this is the accordion body 1
+        </ai>
+        <ai header="this is some header 2">
+            this is the accordion body 2
+        </ai>
+        <ai header="this is some header 3">
+            this is the accordion body 3
+        </ai>
+    </accordion>
+
     
+    <hr><!-- ACCORDION WITH MODIFIER ATTRIBUTES -->
+    <accordion type="flush" open="always">
+        <ai header="first item, pog">
+            so <strong>THIS</strong> is strong
+        </ai>
+        <ai header="should be open" show="show">
+            this should be visible
+        </ai>
+        <ai header="independant collapse">
+            also these shouldn't close after another <code>ai</code> (accordion item) is opened
+        </ai>
+    </accordion>
+
+    <hr><!-- GENERATOR EXAMPLES -->
     <script>
+        parseCustomTags();
+
         let container = genContainer('fluid');
         container.appendChild(genRow([2,8,2]));
         document.body.appendChild(container);

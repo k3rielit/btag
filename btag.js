@@ -3,9 +3,23 @@
 // --------- //
 
 let breakpoints = ['xs','sm','md','lg','xl','xxl'];
-let btags = ['accordion','alert','badge','breadcrumb','card','carousel','collapse','dropdown','modal','navtab','navbar','offcanvas','popover','progress','scrollspy','spinner','toast'];
-
-
+let btags = {
+    tags: ['accordion','ai','alert','badge','breadcrumb','card','carousel','collapse','dropdown','modal','navtab','navbar','offcanvas','popover','progress','scrollspy','spinner','toast'],
+    accordion: {
+        attrs: ['type','open'],
+        type: ['flush'],
+        open: 'always',
+        index: 0,
+        gen: genAccordion,
+    },
+    ai: {
+        attrs: ['header','show'],
+        header: 'innerHTML',
+        show: 'show',
+        index: 0,
+        gen: genAi,
+    }
+}
 
 // ------------- //
 // function:void //
@@ -32,6 +46,42 @@ function addBootstrap(css,js) {
         enablePopovers();
     }
 }
+
+function enableTooltips() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (elem) {
+       return new bootstrap.Tooltip(elem);
+    })
+}
+
+function enablePopovers() {
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    })
+}
+
+function parseCustomTags() {
+    btags.tags.forEach((btag) => {
+        let elems = document.getElementsByTagName(btag);            // looping through all the custom tags
+        while(elems.length>0) {
+            let attrs = [];
+            for(_a of btags[btag].attrs) {
+                attrs.push(elems[0].getAttribute(_a));              // collecting attributes from the custom tag
+            }
+            let parsedTag = btags[btag].gen(attrs,elems[0].parentNode,elems[0].innerHTML);    // generating the new one and moving the old innerHTML to it
+            elems[0].parentNode.replaceChild(parsedTag,elems[0]);                             // replacing the custom tag with the generated one
+            btags[btag].index++;
+        }
+    });
+    console.log('[btag.js] Parser successfully ran.');
+}
+
+
+
+// -------------------- //
+// function:HTMLElement //
+// -------------------- //
 
 // breakpoint:string
 // .container / .container-fluid / .container-{breakpoint: sm/md/lg/xl/xxl}
@@ -81,29 +131,28 @@ function genGrid(rows,breakpoint) {
     return container;
 }
 
-
-
-// ------------- //
-// function:void //
-// ------------- //
-
-function enableTooltips() {
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (elem) {
-       return new bootstrap.Tooltip(elem);
-    })
+function genAccordion(attrs,parentNode,innerHTML) {
+    let elem = document.createElement('div');
+    if(attrs.includes('always')) {
+        elem.setAttribute('open','always');
+    }
+    elem.classList.add('accordion');
+    if(attrs.includes('flush')) {
+        elem.classList.add('accordion-flush');
+    }
+    elem.id = `accordion-${btags['accordion'].index}`;
+    elem.innerHTML = innerHTML;
+    return elem;
 }
 
-function enablePopovers() {
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl);
-    })
-}
-
-// convert all custom tags to nodes, for ex. <accordion title="ttl" style="background-color: red;">...</accordion> -> actual bootstrap
-function parseCustomTags() {
-    // ...
+function genAi(attrs,parentNode,innerHTML) {
+    let elem = document.createElement('div');
+    elem.className = 'accordion-item';
+    // bruh...
+    let head = `<h2 class="accordion-header" id="header-${btags['ai'].index}"><button class="accordion-button${(attrs.includes('show')?'':' collapsed')}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${btags['ai'].index}" aria-expanded="${(attrs.includes('show')?'true':'false')}" aria-controls="collapse-${btags['ai'].index}">${attrs[0]}</button></h2>`;
+    let body = `<div id="collapse-${btags['ai'].index}" class="accordion-collapse collapse${(attrs.includes('show')?' show':'')}" aria-labelledby="header-${btags['ai'].index}"${(parentNode.hasAttribute('open')?'':` data-bs-parent="#${parentNode.id}"`)}>${innerHTML}</div>`;
+    elem.innerHTML = head+body;
+    return elem;
 }
 
 
@@ -111,4 +160,4 @@ function parseCustomTags() {
 // ---------- //
 // after load //
 // ---------- //
-console.log('BootstrapTagManager for Bootstrap 5.1 loaded.');
+console.log('[btag.js] BootstrapTagManager for Bootstrap 5.1 loaded.');
