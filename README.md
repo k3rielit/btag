@@ -1,78 +1,54 @@
 ## BOOTSTRAP TAG MANAGER
-A javascript library that can be used to generate Bootstrap (only 5.1.3 for now) components quickly. It doesn't support additional HTML content, non-bootstrap classes, and other attributes yet.
+A javascript library that can generate Bootstrap (5.1.3) components from custom HTML tags, so I won't have to carry the get started page with me everywhere.<br>
+
+## CHANGELOG
+2021.11.14:
+- merged btag attributes: ```<tag b-attr="flush,noautoclose,..."```
+- rewrote parser with a new structure in mind
+- moved attribute collector into a separate function
+- attribute collector now collects btag and normal attrs into an object, separately
+- generators now re-apply every attribute after parsing, and use them during generation (ids for ex.)
+
+## TODO
+* Finishing the remaining generators.
+* Maybe bootstrap/other icons.
+* ...
 
 ## DOCUMENTATION
 
 ### custom HTML tags
+**ACCORDION**<br>
+Source: [getbootstrap.com](https://getbootstrap.com/docs/5.1/components/accordion/)<br>
+A list of dropdowns. By default, only one ai can be open per list (opening one autocloses the other ones), which can be disabled with the noautohide attribute. Flush removes background color, border, and rounded corners.<br>
+Syntax:
+```<accordion b-attr="noautohide, flush" />```
+```<ai header="innerHTML" b-attr="show" />```
 ```html
-<!-- ACCORDION-->
+<!-- ACCORDION -->
 <accordion>
-    <ai header="this is some header 1">this is the collapsable body 1</ai>
-    <ai header="this is some header 2">which can have <code>HTML</code> in it</ai>
+    <ai>dropdown body 1</ai>
+    <ai header="this is some header 1">dropdown body 2</ai>
+    <ai header="header &nbsp; <s> 3 </s> &nbsp; 2 with HTML">dropdown body 3</ai>
 </accordion>
-<!-- ACCORDION WITH MODIFIER ATTRIBUTES -->
-<accordion type="flush" open="always">
-    <ai header="should be open" show="show">this should be visible</ai>
-    <ai header="independant collapse">also these shouldn't close after another <code>ai</code> (accordion item) is opened</ai>
+<!-- WITH MODIFIERS -->
+<accordion b-attr="noautohide,flush">
+    <ai header="open by default" b-attr="show">this should be visible, and...</ai>
+    <ai header="noautohide">these won't close after another <code>ai</code> is opened</ai>
 </accordion>
-```
-
-### function:HTMLElement
-```ts 
-addBootstrap(css:boolean,js:boolean)
-// Imports Bootstrap, only the 5.1.3 version right now.
-```
-
-```ts
-genContainer(breakpoint:string)
-// Returns a container node with an optional breakpoint class.
-```
-
-```ts
-genAccordion(attrs:[],parentNode:Node,innerHTML:string)
-// Returns a new accordion node.
-// - attrs:[] can contain: 
-// - number[] (each item is a column, with the number being its width)
-// - string[] (each item is a column, with the string being the classes after row- in bootstrap).
-```
-
-```ts
-genRow(cols:number)
-genRow(cols:number[])
-genRow(cols:string[])
-// Returns a row node with optional column nodes.
-// The cols parameter can be:
-// - number   (appends that many row children)
-// - number[] (each item is a column, with the number being its width)
-// - string[] (each item is a column, with the string being the classes after row- in bootstrap).
-```
-
-```ts
-genCol(param:string)
-genCol(param:number)
-// Returns a column node with an optional breakpoint and/or column span class from the parameter.
-```
-
-```ts
-genGrid(rows,breakpoint:string)
-// Returns a grid, with an optional row-column layout and breakpoint class.
-// The rows parameter is an array of row parameters (see genRow(...)).
 ```
 
 ### function:void
+```ts 
+addBootstrap(css:boolean,js:boolean)
+// Import (5.1.3) bootstrap.min.css, and/or bootstrap.bundle.min.js based on the parameters.
+```
+
 ```ts
+// Enable all bootstrap tooltips.
 enableTooltips()
-// Enables all tooltips.
 ```
 
 ```ts
+// Enable all bootstrap popovers.
 enablePopovers()
-// Enables all popovers.
 ```
-
-## TODO
-* Finishing the generators.
-* Changing the btags variable to an object which includes everything needed to convert the custom tags.
-* Multiple bootstrap version support.
-* Maybe bootstrap/other icons.
-* ...
