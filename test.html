@@ -46,8 +46,9 @@
 
     <hr><!-- NORMAL AND DISMISSIBLE ALERT -->
     <alert>basic</alert>
-    <alert b-attr="danger">alert #1</alert>
-    <alert b-attr="success, dismiss, fade, show">alert #1</alert>
+    <alert b-attr="danger">red</alert>
+    <alert b-attr="success, dismiss, fade, show">green</alert>
+    <alert b-attr="success, dismiss, fade">hidden green</alert>
 
 
     <hr><!-- NORMAL AND PILL BADGES -->
@@ -62,7 +63,7 @@
     <breadcr style="--bs-breadcrumb-divider: '>';">
         <bi><a href="#">Home</a></bi>
         <bi><a href="#">Downloads</a></bi>
-        <bi><a href="#">Twitch</a></bi>
+        <bi>Twitch</bi>
         <bi b-attr="active">src</bi>
     </breadcr>
     
@@ -78,8 +79,20 @@
     <btn b-attr="secondary,button,input">INPUT, type-button</btn>
 
 
-    <hr><!-- BUTTON CHECKBOX/RADIO -->
-    <btn b-attr="input,checkbox">Basic</btn>
+    <hr><!-- BUTTON GROUP RADIO -->
+    <btn-group aria-label="Basic radio toggle button group">
+        <btn b-attr="primary,input,radio" name="radio1">Yes</btn>
+        <btn b-attr="primary,input,radio" name="radio1">No</btn>
+        <btn b-attr="primary,input,radio" name="radio1" checked>Maybe</btn>
+    </btn-group>
+
+
+    <hr><!-- BUTTON GROUP CHECKBOX -->
+    <btn-group>
+        <btn b-attr="input,checkbox" name="ckeck1">Frissesség</btn>
+        <btn b-attr="input,checkbox" name="ckeck1" checked>Minőség</btn>
+        <btn b-attr="input,checkbox" name="ckeck1">Kedvező ár</btn>
+    </btn-group>
 
 
     <hr>

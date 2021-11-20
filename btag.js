@@ -3,7 +3,7 @@
 // --------- //
 
 const colors = ['primary','secondary','success','danger','warning','info','light','dark'];
-let defaultcolor = 'primary';
+const defaultcolor = 'primary';
 const breakpoints = ['xs','sm','md','lg','xl','xxl'];
 const __tags = ['accordion','ai','alert','badge','breadcrumb','card','carousel','collapse','dropdown','modal','navtab','navbar','offcanvas','popover','progress','scrollspy','spinner','toast'];
 let btags = [
@@ -14,6 +14,7 @@ let btags = [
     {name:'breadcr', i:0, gen:genBreadcrumb},
     {name:'bi', i:0, gen:genBi},
     {name:'btn', i:0, gen:genBtn},
+    {name:'btn-group', i:0, gen:genBtnGroup}
 ];
 
 
@@ -21,14 +22,10 @@ let btags = [
 // function:void //
 // ------------- //
 
-// tag:string
-function btagsI(tag) {
-    return btags.find(f => f.name==tag).i;
-}
 
 // css:boolean  js:boolean
 function addBootstrap(css,js) {
-    if(css==true) {
+    if(css===true) {
         let cssNode = document.createElement('link');
         cssNode.href = 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css';
         cssNode.rel = 'stylesheet';
@@ -36,7 +33,7 @@ function addBootstrap(css,js) {
         cssNode.crossOrigin = 'anonymous';
         document.head.prepend(cssNode);
     }
-    if(js==true) {
+    if(js===true) {
         let jsNode = document.createElement('script');
         jsNode.src = 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js';
         jsNode.integrity = 'sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p';
@@ -65,8 +62,14 @@ function parseCustomTags() {
     btags.forEach((btag) => {
         let elems = document.getElementsByTagName(btag.name);    // looping through all the custom tags
         while(elems.length>0) {
-            let parsedTag = btag.gen(collectAttrsObj(elems[0]), elems[0].innerHTML, elems[0].parentNode);    // generating the new one and moving the old innerHTML to it
-            elems[0].parentNode.replaceChild(parsedTag, elems[0]);    // replacing the custom tag with the generated one
+            let genResult = btag.gen(collectAttrsObj(elems[0]), elems[0].innerHTML, elems[0].parentNode);    // generating the new one and moving the old innerHTML to it
+            if(Array.isArray(genResult)) {
+                genResult.forEach(ptag => {
+                    elems[0].parentNode.insertBefore(ptag,elems[0]);
+                });
+                elems[0].remove();
+            }
+            else elems[0].parentNode.replaceChild(genResult, elems[0]);    // replacing the custom tag with the generated one
             btag.i++;
         }
     });
@@ -74,9 +77,9 @@ function parseCustomTags() {
 }
 
 
-// --------------- //
-// function:object //
-// --------------- //
+// --------- //
+// Utilities //
+// --------- //
 
 // tag:HTMLElement
 function collectAttrsObj(tag) {
@@ -100,11 +103,6 @@ function collectAttrs(tag) {
     return result;
 } 
 
-
-// -------------------- // ---------------------------- //
-// function:HTMLElement // Misc HTMLElement generators. //
-// -------------------- // ---------------------------- //
- 
 // tag:string   attrs:object  classList:[]  id:string
 function genElem(tag,attrs,classList,id) {
     let elem = document.createElement(tag);
@@ -118,6 +116,10 @@ function genElem(tag,attrs,classList,id) {
     return elem;
 }
 
+// tag:string
+function btagsI(tag) {
+    return btags.find(f => f.name==tag).i;
+}
 
 // -------------------- // ---------------------------------------------- //
 // function:HTMLElement // Functions for generating bootstrap components. //
@@ -140,12 +142,12 @@ function genAi(attrs,innerHTML,parentNode) {
 }
 
 function genAlert(attrs,innerHTML,parentNode) {
-    let elem = genElem('div',attrs.attrs,['alert'], '');
+    let _color = attrs.b_attrs.filter(b_attr => colors.includes(b_attr)).concat(defaultcolor)[0];
+    let elem = genElem('div',attrs.attrs,['alert','alert-'+_color], '');
     elem.innerHTML = innerHTML;
     elem.setAttribute('role','alert');
     attrs.b_attrs.forEach(b_attr => {
-        if(colors.includes(b_attr)) elem.classList.add('alert-'+b_attr);
-        else if(b_attr==='dismiss') {
+        if(b_attr==='dismiss') {
             elem.innerHTML += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
             elem.classList.add('alert-dismissible');
         }
@@ -155,15 +157,9 @@ function genAlert(attrs,innerHTML,parentNode) {
 }
 
 function genBadge(attrs,innerHTML,parentNode) {
-    let elem = genElem('span',attrs.attrs,['badge', attrs.b_attrs.includes('pill') ? 'rounded-pill' : ''],'');
+    let _color = attrs.b_attrs.filter(b_attr => colors.includes(b_attr)).concat(defaultcolor)[0];
+    let elem = genElem('span', attrs.attrs, ['badge', attrs.b_attrs.includes('pill') ? 'rounded-pill' : '', 'bg-'+_color, ['warning','info','light'].includes(_color)?'text-dark':''],'');
     elem.innerHTML = innerHTML;
-    attrs.b_attrs.forEach(b_attr => {
-        if(['warning','info','light'].includes(b_attr)) {
-            elem.classList.add('bg-'+b_attr);
-            elem.classList.add('text-dark');
-        }
-        else if(colors.includes(b_attr)) elem.classList.add('bg-'+b_attr);
-    });
     return elem;
 }
 
@@ -183,27 +179,31 @@ function genBi(attrs,innerHTML,parentNode) {
 
 function genBtn(attrs,innerHTML,parentNode) {
     let outline = attrs.b_attrs.includes('outline') ? 'outline-' : '';
-    let colorAttrs = attrs.b_attrs.concat('link').filter(b_attr => colors.includes(b_attr));
+    let _color = attrs.b_attrs.filter(b_attr => colors.concat('link').includes(b_attr)).concat(defaultcolor)[0];
     let typeAttrs = attrs.b_attrs.filter(attr => ['submit','button','reset','radio','checkbox'].includes(attr));
     let active = attrs.b_attrs.includes('active') ? 'active' : '';
     let elem;
     if(attrs.b_attrs.includes('a')) elem = genElem('a',attrs.attrs.concat([['role','button'],['href','#']]),['btn',active],'');
     else if(attrs.b_attrs.includes('input') && typeAttrs.length>0 && ['radio','checkbox'].includes(typeAttrs[0])) {
         let _id = `btag-btn-${typeAttrs[0]}-${btagsI('btn')}`;
-        input_elem = genElem('input',attrs.attrs.concat([['autocomplete','off']]),['btn-check'],_id);
-        elem = genElem('label',attrs.attrs.concat([['for',_id]]),['btn']); // label for input
-        elem.innerHTML = innerHTML;
-        parentNode.appendChild(input_elem);
+        input_elem = genElem('input',attrs.attrs.concat([['autocomplete','off'],['type',typeAttrs[0]]]),['btn-check'],_id);
+        elem = genElem('label',attrs.attrs.concat([['for',_id]]),['btn','btn-outline-'+_color]);
+        elem.innerHTML = innerHTML; // here input_elem is the <INPUT>, and elem is the <LABEL>
+        return [input_elem,elem];
     }
     else if(attrs.b_attrs.includes('input')) elem = genElem('input',attrs.attrs.concat([['value',innerHTML]]),['btn',active],'');
     else elem = genElem('button',attrs.attrs,['btn',active],'');
     elem.innerHTML = ['A','BUTTON'].includes(elem.tagName) ? innerHTML : '';
-    elem.classList.add(colorAttrs.length===0 ? 'btn-'+outline+'primary' : 'btn-'+outline+colorAttrs[0]);
+    elem.classList.add('btn-'+outline+_color);
     elem.setAttribute('type',typeAttrs.length>0 ? typeAttrs[0] : 'button');
     return elem;
 }
 
-function genBtnGroup(attrs,innerHTML,parentNode) {}
+function genBtnGroup(attrs,innerHTML,parentNode) {
+    let elem = genElem('div',attrs.attrs.concat([['role','group']]),['btn-group'],'');
+    elem.innerHTML = innerHTML;
+    return elem;
+}
 
 
 // ---------- //

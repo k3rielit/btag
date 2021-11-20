@@ -12,14 +12,14 @@ A javascript library that can generate Bootstrap (5.1.3) components from custom 
 # TODO
 * Finishing the remaining generators.
 * Maybe bootstrap/other icons.
-* Set primary color as default on other components too, not just for buttons.
 * Maybe add a button with a badge on its top right corner as an individual component
 * Maybe move the breadcrumb separator character to an attribute.
 * Have a minimized variant.
+* Component modules instead of this js file.
 
 # HOW TO USE
 * Include **btag.js** somewhere.
-* (Optional: include **bootstrap 5.1.3** automatically with ```addBootstrap(true,true)```)
+* (Optional: include **Bootstrap 5.1.3** automatically with ```addBootstrap(true,true)```)
 * Run ```parseCustomTags()``` at the end of the page.
 
 
@@ -50,7 +50,7 @@ A list of dropdowns. By default, only one ai can be open per list (opening one a
 ## ALERT ([docs](https://getbootstrap.com/docs/5.1/components/alerts/))
 A simple text block with different colors with static and a dismissible variant. When the dismiss attribute is set, it will create a button on the right side of the alert to close it. Fade just sets the fade animation, and show makes it visible by default (useful only for dismissible alerts).
 
-**Attributes**: ```b-attr: <a color>, dismiss, fade, show```<br>
+**Attributes**: ```b-attr: <color>, dismiss, fade, show```<br>
 **Colors**: ```primary, secondary, success, danger, warning, info, light, dark```
 ```html
 <!-- NORMAL AND DISMISSIBLE ALERT -->
@@ -64,7 +64,7 @@ A simple text block with different colors with static and a dismissible variant.
 ## BADGE ([docs](https://getbootstrap.com/docs/5.1/components/badge/))
 A small inline text block with different background colors (automatically sets the text color to light/dark). Pill makes the corners more rounded.
 
-**Attributes**: ```b-attr: <a color>, pill```<br>
+**Attributes**: ```b-attr: <color>, pill```<br>
 **Colors**: ```primary, secondary, success, danger, warning, info, light, dark```
 ```html
 <!-- NORMAL AND PILL BADGES -->
@@ -98,12 +98,11 @@ A visualized path, separated with ```/``` by default, but can be changed with cs
 
 
 
-## [WIP] BUTTON ([docs](https://getbootstrap.com/docs/5.1/components/breadcrumb/))
-*The input variant with the radio and checkbox types is still in development, but other attributes should work.*<br>
+## BUTTON ([docs](https://getbootstrap.com/docs/5.1/components/buttons/))
+There were tons of options here to make a bootstrap button, and for some reason I'm implementing all of them. Anyways, outline replaces the filled background color style with an outline, a/input generates ```<a>```/```<input>``` tags instead of ```<button>```, submit/button/reset/radio/checkbox sets the ```type="..."``` attribute in HTML, which is neccessary for the input variant, and active darkens the button a little bit.<br>
+***For radio/checkbox types, a btn-group, and matching name attributes in that group are recommended.***
 
-There were tons of options here to make a bootstrap button, and for some reason I'm implementing all of them. Anyways, outline replaces the filled background color style with an outline, a/input generates ```<a>```/```<input>``` tags instead of ```<button>```, submit/button/reset sets the ```type="..."``` attribute in HTML, which is neccessary for the input variant, and active darkens the button a little bit.
-
-**Attributes**: ```b-attr: <a color>, outline, a/input, submit/button/reset, active```<br>
+**Attributes**: ```b-attr: <color>, outline, a/input, submit/button/reset/radio/checkbox, active```<br>
 **Colors**: ```primary, secondary, success, danger, warning, info, light, dark, link```
 ```html
 <!-- BUTTON,A,INPUT -->
@@ -114,6 +113,27 @@ There were tons of options here to make a bootstrap button, and for some reason 
 <btn b-attr="warning,outline,a">A, outlined</btn>
 <btn b-attr="danger,reset">type-reset</btn>
 <btn b-attr="secondary,button,input">INPUT, type-button</btn>
+```
+
+
+
+## BUTTON GROUP ([docs](https://getbootstrap.com/docs/5.1/components/button-group/))
+A container for a list of buttons inside it. 
+
+**Attributes**: *none*
+```html
+<!-- BUTTON GROUP RADIO -->
+<btn-group aria-label="Basic radio toggle button group">
+    <btn b-attr="primary,input,radio" name="radio1">Yes</btn>
+    <btn b-attr="primary,input,radio" name="radio1">No</btn>
+    <btn b-attr="primary,input,radio" name="radio1" checked>Maybe</btn>
+</btn-group>
+<!-- BUTTON GROUP CHECKBOX -->
+<btn-group>
+    <btn b-attr="input,checkbox" name="ckeck1">Frissesség</btn>
+    <btn b-attr="input,checkbox" name="ckeck1" checked>Minőség</btn>
+    <btn b-attr="input,checkbox" name="ckeck1">Kedvező ár</btn>
+</btn-group>
 ```
 
 
